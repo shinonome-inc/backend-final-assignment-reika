@@ -21,6 +21,5 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("tweets/", include("tweets.urls")),
     path("", include("welcome.urls")),
-    path('', Home.as_view(), name='home'),
     path('blog/', include('blog.urls')),
 ]
