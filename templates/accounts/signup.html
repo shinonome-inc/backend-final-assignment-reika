@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block_title %} Twitter Clone {% endblock %}</title>
+    </head>
+    <body>
+        <header class="mb3">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'welcome:welcome' %}">Twitter Clone</a></li>
+                    <li><a href="{% url 'accounts:signup' %}">Twitter Clone</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+    </body>
+</html>
