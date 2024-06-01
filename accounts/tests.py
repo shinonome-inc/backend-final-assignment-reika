@@ -4,6 +4,7 @@ from django.urls import reverse
 
 User = get_user_model()
 
+
 class TestSignupView(TestCase):
     def setup(self):
         self.url = reverse("accounts:signup")
@@ -15,32 +16,32 @@ class TestSignupView(TestCase):
 
     def test_success_post(self):
         valid_data = {
-            "username":"testuser",
-            "email": "test@test.com",
-            "password1": "testpassword",
-            "password2": "testpassword",
+            "username" : "testuser",
+            "email" : "test@test.com",
+            "password1" : "testpassword",
+            "password2" : "testpassword",
         }
 
         response = self.client.post(self.url, valid_data)
         self.assertRedirects(
             response,
             reverse("tweets:home"),
-            status_code=302
+            status_code=302,
             target_status_code=200
         )
         self.assertTrue(User.objects.filter(usename=valid_data["usename"]).exists())
         self.assertIn(SESSION_KEY, self.client.session)
-        
-    def test_failure_post_with_empty_username(self):      
+
+    def test_failure_post_with_empty_username(self):
         invalid_data = {
-            "usename":"",
-            "email":"test@test.com",
-            "password1":"testpassword",
-            "password2":"testpassword",
+            "usename" : "",
+            "email" : "test@test.com",
+            "password1" : "testpassword",
+            "password2" : "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["usename"]).exists())
         self.assertFalse(form.is_valid())
@@ -48,12 +49,12 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_empty_form(self):
         invalid_data = {
-            "usename":"",
-            "email":"",
-            "password1":"",
-            "password2":"",
+            "usename" : "",
+            "email" : "",
+            "password1" : "",
+            "password2" : "",
         }
-        
+
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
 
@@ -62,76 +63,73 @@ class TestSignupView(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("フォームが入力されていません。", form.errors("form"))
 
-    def test_failure_post_with_empty_email(self):      
+    def test_failure_post_with_empty_email(self):
         invalid_data = {
-            "usename":"testuser",
-            "email":"",
-            "password1":"testpassword",
-            "password2":"testpassword",
+            "usename" : "testuser",
+            "email" : "",
+            "password1" : "testpassword",
+            "password2" : "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
         self.assertFalse(form.is_valid())
         self.assertIn("このフィールドは必須です。", form.errors("email"))
 
-    def test_failure_post_with_empty_password(self):      
+    def test_failure_post_with_empty_password(self):
         invalid_data = {
-            "usename":"testuser",
-            "email":"test@test.com",
-            "password1":"",
-            "password2":"",
+            "usename" : "testuser",
+            "email" : "test@test.com",
+            "password1" : "",
+            "password2" : "",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
         self.assertFalse(form.is_valid())
         self.assertIn("このフィールドは必須です。", form.errors("password"))
 
-
     def test_failure_post_with_duplicated_user(self):
         invalid_data = {
-            "usename":"testuser2",
-            "email":"test@test.com",
-            "password1":"testpassword",
-            "password2":"testpassword",
+            "usename" : "testuser2",
+            "email" : "test@test.com",
+            "password1" : "testpassword",
+            "password2" : "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
         self.assertFalse(form.is_valid())
         self.assertIn("このユーザー名は既に使われています。", form.errors("username"))
 
-            
-            
     def test_failure_post_with_invalid_email(self):
         invalid_data = {
             'username': 'testuser',
             'email': 'invalid-email',
-            'password1': 'testpassword',
-            "password2":"testpassword"
+            'password1' : 'testpassword',
+            "password2" : "testpassword"
         }
-        
+
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
         self.assertFalse(form.is_valid())
         self.assertIn("メールが有効でありません", form.errors("email"))
-        
+
     def test_failure_post_with_too_short_password(self):
         invalid_data = {
-            'username': 'testuser',
-            'email': 'test@test.com',
-            'password1': 'short',
-            "password2":"short"
+            'username' : 'testuser',
+            'email' : 'test@test.com',
+            'password1' : 'short',
+            "password2" : "short"
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -141,14 +139,14 @@ class TestSignupView(TestCase):
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
         self.assertFalse(form.is_valid())
         self.assertIn("パスワードが短すぎます。", form.errors("password1"))
-        
+
     def test_failure_post_with_password_similar_to_username(self):
 
         invalid_data = {
-            'username': 'testuser',
-            'email': 'test@test.com',
-            'password1': 'testuseral',
-            "password2":"testuseral"
+            'username' : 'testuser',
+            'email' : 'test@test.com',
+            'password1' : 'testuseral',
+            "password2" : "testuseral"
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -161,10 +159,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_only_numbers_password(self):
         invalid_data = {
-            'username': 'testuser',
-            'email': 'test@test.com',
-            'password1': '12345',
-            "password2":"12345"
+            'username' : 'testuser',
+            'email' : 'test@test.com',
+            'password1' : '12345',
+            "password2" : "12345"
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -179,8 +177,8 @@ class TestSignupView(TestCase):
         invalid_data = {
             'username': 'testuser',
             'email': 'test@test.com',
-            'password1': 'testpassword',
-            "password2":"wrongpassword"
+            'password1' : 'testpassword',
+            "password2" : "wrongpassword"
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -191,6 +189,7 @@ class TestSignupView(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("パスワードが一致していません。", form.errors("password1, password2"))
 
+
 class TestHomeView(TestCase):
     def setUo(self):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
@@ -200,7 +199,7 @@ class TestHomeView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code,  200)
 
-#class TestLoginView(TestCase):
+#      class TestLoginView(TestCase):
 #     def test_success_get(self):
 
 #     def test_success_post(self):
