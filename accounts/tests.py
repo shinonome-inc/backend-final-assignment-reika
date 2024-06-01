@@ -35,7 +35,7 @@ class TestSignupView(TestCase):
             "password2": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["usename"]).exists())
@@ -51,7 +51,7 @@ class TestSignupView(TestCase):
         }
 
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(form=invalid_data["form"]).exists())
@@ -66,7 +66,7 @@ class TestSignupView(TestCase):
             "password2": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -81,7 +81,7 @@ class TestSignupView(TestCase):
             "password2": "",
         }
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -96,7 +96,7 @@ class TestSignupView(TestCase):
             "password2": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -112,7 +112,7 @@ class TestSignupView(TestCase):
         }
 
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -123,7 +123,7 @@ class TestSignupView(TestCase):
         invalid_data = {"username": "testuser", "email": "test@test.com", "password1": "short", "password2": "short"}
 
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status.code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -140,7 +140,7 @@ class TestSignupView(TestCase):
         }
 
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status.code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -151,7 +151,7 @@ class TestSignupView(TestCase):
         invalid_data = {"username": "testuser", "email": "test@test.com", "password1": "12345", "password2": "12345"}
 
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status.code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
@@ -167,7 +167,7 @@ class TestSignupView(TestCase):
         }
 
         response = self.client.post(self.url, invalid_data)
-        form = response.content("form")
+        form = response.content["form"]
 
         self.assertEqual(response.status.code, 200)
         self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
