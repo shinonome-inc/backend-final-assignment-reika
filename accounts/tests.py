@@ -11,33 +11,28 @@ class TestSignupView(TestCase):
 
     def test_success_get(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code,  200)
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "accounts/signup.html")
 
     def test_success_post(self):
         valid_data = {
-            "username" : "testuser",
-            "email" : "test@test.com",
-            "password1" : "testpassword",
-            "password2" : "testpassword",
+            "username": "testuser",
+            "email": "test@test.com",
+            "password1": "testpassword",
+            "password2": "testpassword",
         }
 
         response = self.client.post(self.url, valid_data)
-        self.assertRedirects(
-            response,
-            reverse("tweets:home"),
-            status_code=302,
-            target_status_code=200
-        )
+        self.assertRedirects(response, reverse("tweets:home"), status_code=302, target_status_code=200)
         self.assertTrue(User.objects.filter(usename=valid_data["usename"]).exists())
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_username(self):
         invalid_data = {
-            "usename" : "",
-            "email" : "test@test.com",
-            "password1" : "testpassword",
-            "password2" : "testpassword",
+            "usename": "",
+            "email": "test@test.com",
+            "password1": "testpassword",
+            "password2": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
@@ -49,10 +44,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_empty_form(self):
         invalid_data = {
-            "usename" : "",
-            "email" : "",
-            "password1" : "",
-            "password2" : "",
+            "usename": "",
+            "email": "",
+            "password1": "",
+            "password2": "",
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -65,10 +60,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_empty_email(self):
         invalid_data = {
-            "usename" : "testuser",
-            "email" : "",
-            "password1" : "testpassword",
-            "password2" : "testpassword",
+            "usename": "testuser",
+            "email": "",
+            "password1": "testpassword",
+            "password2": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
@@ -80,10 +75,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_empty_password(self):
         invalid_data = {
-            "usename" : "testuser",
-            "email" : "test@test.com",
-            "password1" : "",
-            "password2" : "",
+            "usename": "testuser",
+            "email": "test@test.com",
+            "password1": "",
+            "password2": "",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
@@ -95,10 +90,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_duplicated_user(self):
         invalid_data = {
-            "usename" : "testuser2",
-            "email" : "test@test.com",
-            "password1" : "testpassword",
-            "password2" : "testpassword",
+            "usename": "testuser2",
+            "email": "test@test.com",
+            "password1": "testpassword",
+            "password2": "testpassword",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
@@ -110,10 +105,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_invalid_email(self):
         invalid_data = {
-            'username': 'testuser',
-            'email': 'invalid-email',
-            'password1' : 'testpassword',
-            "password2" : "testpassword"
+            "username": "testuser",
+            "email": "invalid-email",
+            "password1": "testpassword",
+            "password2": "testpassword",
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -125,12 +120,7 @@ class TestSignupView(TestCase):
         self.assertIn("メールが有効でありません", form.errors("email"))
 
     def test_failure_post_with_too_short_password(self):
-        invalid_data = {
-            'username' : 'testuser',
-            'email' : 'test@test.com',
-            'password1' : 'short',
-            "password2" : "short"
-        }
+        invalid_data = {"username": "testuser", "email": "test@test.com", "password1": "short", "password2": "short"}
 
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
@@ -143,10 +133,10 @@ class TestSignupView(TestCase):
     def test_failure_post_with_password_similar_to_username(self):
 
         invalid_data = {
-            'username' : 'testuser',
-            'email' : 'test@test.com',
-            'password1' : 'testuseral',
-            "password2" : "testuseral"
+            "username": "testuser",
+            "email": "test@test.com",
+            "password1": "testuseral",
+            "password2": "testuseral",
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -158,12 +148,7 @@ class TestSignupView(TestCase):
         self.assertIn("パスワードがユーザー名に類似しています。", form.errors("password1"))
 
     def test_failure_post_with_only_numbers_password(self):
-        invalid_data = {
-            'username' : 'testuser',
-            'email' : 'test@test.com',
-            'password1' : '12345',
-            "password2" : "12345"
-        }
+        invalid_data = {"username": "testuser", "email": "test@test.com", "password1": "12345", "password2": "12345"}
 
         response = self.client.post(self.url, invalid_data)
         form = response.content("form")
@@ -175,10 +160,10 @@ class TestSignupView(TestCase):
 
     def test_failure_post_with_mismatch_password(self):
         invalid_data = {
-            'username': 'testuser',
-            'email': 'test@test.com',
-            'password1' : 'testpassword',
-            "password2" : "wrongpassword"
+            "username": "testuser",
+            "email": "test@test.com",
+            "password1": "testpassword",
+            "password2": "wrongpassword",
         }
 
         response = self.client.post(self.url, invalid_data)
@@ -197,7 +182,8 @@ class TestHomeView(TestCase):
 
     def test_success_get(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code,  200)
+        self.assertEqual(response.status_code, 200)
+
 
 #      class TestLoginView(TestCase):
 #     def test_success_get(self):
