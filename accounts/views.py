@@ -24,11 +24,11 @@ class SignupView(CreateView):
         return response
 
     def signup(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             form = SignupForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('tweets:home')
+            return redirect("tweets:home")
         else:
             form = SignupForm()
-        return render(request, 'accounts/signup.html', {'form': form})
+        return render(request, "accounts/signup.html", {"form": form})

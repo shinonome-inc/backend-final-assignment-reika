@@ -152,11 +152,7 @@ class TestSignupView(TestCase):
         self.assertIn("このパスワードは ユーザー名 と似すぎています。", form.errors["password2"])
 
     def test_failure_post_with_only_numbers_password(self):
-        invalid_data = {
-            "username": "testuser",
-            "email": "test@test.com",
-            "password1": "12345",
-            "password2": "12345"}
+        invalid_data = {"username": "testuser", "email": "test@test.com", "password1": "12345", "password2": "12345"}
 
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
