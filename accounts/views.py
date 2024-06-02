@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
@@ -15,20 +14,9 @@ class SignupView(CreateView):
         response = super().form_valid(form)
         username = form.cleaned_data["username"]
         password = form.cleaned_data["password1"]
-        user = authenticate(username=username, password=password)
+        user = authenticate(self.request, username=username, password=password)
         login(self.request, user)
         return response
 
     def form_invalid(self, form):
-        response = super().form_invalid(form)
-        return response
-
-    def signup(request):
-        if request.method == "POST":
-            form = SignupForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("tweets:home")
-        else:
-            form = SignupForm()
-        return render(request, "accounts/signup.html", {"form": form})
+        return super().form_invalid(form)

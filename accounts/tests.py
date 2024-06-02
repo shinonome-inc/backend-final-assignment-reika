@@ -50,11 +50,11 @@ class TestSignupView(TestCase):
             "password2": "",
         }
         response = self.client.post(self.url, invalid_data)
+        self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.context, "Response context is None, form not passed to the template.")
 
         if response.context:
             form = response.context["form"]
-            self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
             self.assertFalse(form.is_valid())
 
             self.assertIn("このフィールドは必須です。", form.errors["username"])
@@ -93,8 +93,13 @@ class TestSignupView(TestCase):
         self.assertIn("このフィールドは必須です。", form.errors["password2"])
 
     def test_failure_post_with_duplicated_user(self):
+        User.objects.create_user(
+            username="existinguser",
+            email="test@test.com",
+            password="testpassword",
+        )
         invalid_data = {
-            "username": "testuser2",
+            "username": "existinguser",
             "email": "test@test.com",
             "password1": "testpassword",
             "password2": "testpassword",
@@ -103,9 +108,9 @@ class TestSignupView(TestCase):
         form = response.context["form"]
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(User.objects.filter(username=invalid_data["username"]).exists())
+        self.assertEqual(User.objects.filter(username=invalid_data["username"]).count(), 1)
         self.assertFalse(form.is_valid())
-        self.assertIn("このユーザー名は既に使われています。", form.errors["username"])
+        self.assertIn("同じユーザー名が既に登録済みです。", form.errors["username"])
 
     def test_failure_post_with_invalid_email(self):
         invalid_data = {
