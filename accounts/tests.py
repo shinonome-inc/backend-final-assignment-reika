@@ -24,7 +24,7 @@ class TestSignupView(TestCase):
 
         response = self.client.post(self.url, valid_data)
         self.assertRedirects(response, reverse("tweets:home"), status_code=302, target_status_code=200)
-        self.assertTrue(User.objects.filter(usename=valid_data["usename"]).exists())
+        self.assertTrue(User.objects.filter(usename=valid_data["username"]).exists())
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_username(self):
