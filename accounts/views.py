@@ -28,4 +28,3 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["username"] = self.request.user.username
         return context
-# from django.shortcuts import render
