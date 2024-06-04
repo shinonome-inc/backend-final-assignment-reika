@@ -19,9 +19,6 @@ class SignupView(CreateView):
         login(self.request, user)
         return response
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
-
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = "profiles/profile.html"
