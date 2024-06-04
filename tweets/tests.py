@@ -1,8 +1,15 @@
 # from django.test import TestCase
 
 
-# class TestHomeView(TestCase):
-#     def test_success_get(self):
+class TestHomeView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
+        self.url = reverse("tweets:home")
+
+    def test_success_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
 
 # class TestTweetCreateView(TestCase):
