@@ -187,7 +187,6 @@ class TestSignupView(TestCase):
 # class TestUserProfileView(TestCase)
 #    def test_success_get(self):
 
-
 # class TestUserProfileEditView(TestCase):
 #     def test_success_get(self):
 
