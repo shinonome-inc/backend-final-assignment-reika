@@ -25,6 +25,8 @@ SECRET_KEY = "django-insecure-x+hlabr82)0gfep+bo%6nsehz_n%5_w4*9u*pd9tllw10dj1s1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_USER_MODEL = 'accounts.User'
+
 ALLOWED_HOSTS = []
 
 LOGIN_REDIRECT_URL = "profile"
