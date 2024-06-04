@@ -184,33 +184,39 @@ class TestSignupView(TestCase):
         self.assertIn("確認用パスワードが一致しません。", form.errors["password2"])
 
 
-class TestHomeView(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
-        self.client.login(username="testuser", password="testpassword")
-        self.url = reverse("tweets:home")
-
+class TestLoginView(TestCase):
     def test_success_get(self):
-        response = self.client.get(self.url)
+        response = self.client.get(reverse("login"))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "registration/login.html")
+
+    def test_success_post(self):
+        response = self.client.post(reverse("login"), {"username": "testuser", "password": "testpassword"})
+        self.assertRedirects(response, reverse("profiles/profile.html"))
+
+    def test_failure_post_with_not_exists_user(self):
+        response = self.client.post(reverse("login"), {"username": "notexistuser", "password": "invalidpassword"})
+        response_content = response.content.decode("utf-8")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(username="notexistuser").count(), 0)
+        self.assertIn("正しいユーザー名とパスワードを入力してください。", response_content)
+
+    def test_failure_post_with_empty_password(self):
+        response = self.client.post(reverse("login"), {"username": "testyser", "password": ""})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "registration/login.html")
+        self.assertContains(response, "このフィールドは必須です。")
 
 
-#      class TestLoginView(TestCase):
-#     def test_success_get(self):
-
-#     def test_success_post(self):
-
-#     def test_failure_post_with_not_exists_user(self):
-
-#     def test_failure_post_with_empty_password(self):
+class TestLogoutView(TestCase):
+    def test_success_post(self):
+        self.client.login(username="testuser", password="testpassword")
+        response = self.client.post(reverse("logout"))
+        self.assertRedirects(response, "/")
 
 
-# class TestLogoutView(TestCase):
-#     def test_success_post(self):
-
-
-# class TestUserProfileView(TestCase):
-#     def test_success_get(self):
+# class TestUserProfileView(TestCase)
+#    def test_success_get(self):
 
 
 # class TestUserProfileEditView(TestCase):
