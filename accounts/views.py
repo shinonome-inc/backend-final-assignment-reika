@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 
 from .forms import SignupForm
 
@@ -18,5 +19,12 @@ class SignupView(CreateView):
         login(self.request, user)
         return response
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "profiles/profile.html"
+    login_url = "registration/login.html"
+
+    def get(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["username"] = self.request.user.username
+        return context
