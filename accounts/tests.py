@@ -196,14 +196,19 @@ class TestHomeView(TestCase):
 
 
 class TestLoginView(TestCase):
-    def test_success_get(self):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+
+    def test_success_get(self): 
         response = self.client.get(reverse("login"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/login.html")
 
     def test_success_post(self):
-        response = self.client.post(reverse("login"), {"username": "testuser", "password": "testpassword"})
-        self.assertRedirects(response, reverse("profiles/profile.html"))
+        login_url = reverse('login')
+        response = self.client.post(login_url, {"username": "testuser", "password": "testpassword"})
+        expected_url = reverse('accounts:user_profile', kwargs={'username': 'testuser'})
+        self.assertRedirects(response, expected_url)
 
     def test_failure_post_with_not_exists_user(self):
         response = self.client.post(reverse("login"), {"username": "notexistuser", "password": "invalidpassword"})
