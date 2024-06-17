@@ -27,8 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_REDIRECT_URL = "/accounts/testuser/"
-LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "tweets:home"
+LOGOUT_URL = "accounts:logout"
+LOGOUT_REDIRECT_URL = "accounts:login"
 
 # Application definition
 

@@ -2,6 +2,8 @@ from django.contrib.auth import SESSION_KEY, get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from mysite import settings
+
 User = get_user_model()
 
 
@@ -197,38 +199,55 @@ class TestHomeView(TestCase):
 
 class TestLoginView(TestCase):
     def setUp(self):
+        self.url = reverse(settings.LOGIN_URL)
         self.user = User.objects.create_user(username="testuser", password="testpassword")
 
     def test_success_get(self):
         response = self.client.get(reverse("login"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "registration/login.html")
 
     def test_success_post(self):
-        login_url = reverse("login")
-        response = self.client.post(login_url, {"username": "testuser", "password": "testpassword"})
-        expected_url = reverse("accounts:user_profile", kwargs={"username": "testuser"})
-        self.assertRedirects(response, expected_url)
+        valid_login_data = {
+            "username": "testuser",
+            "password": "testpassword",
+        }
+        response = self.client.post(self.url, valid_login_data)
+        self.assertRedirects(
+            response,
+            reverse(settings.LOGIN_REDIRECT_URL),
+            status_code=302,
+            target_status_code=200,
+        )
+        self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
-        response = self.client.post(reverse("login"), {"username": "notexistuser", "password": "invalidpassword"})
-        response_content = response.content.decode("utf-8")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.filter(username="notexistuser").count(), 0)
-        self.assertIn("正しいユーザー名とパスワードを入力してください。", response_content)
+        invalid_login_data = {
+            "username": "nonexistinguser",
+            "password": "testpassword",
+        }
+        response = self.client.post(self.url, invalid_login_data)
+        form = response.context["form"]
+        self.assertIn(
+            "正しいユーザー名とパスワードを入力してください。どちらのフィールドも大文字と小文字は区別されます。",
+            form.errors["__all__"],
+        )
 
     def test_failure_post_with_empty_password(self):
-        response = self.client.post(reverse("login"), {"username": "testyser", "password": ""})
+        invalid_login_data = {
+            "username": "testuser",
+            "password": "",
+        }
+        response = self.client.post(self.url, invalid_login_data)
+        form = response.context["form"]
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "registration/login.html")
-        self.assertContains(response, "このフィールドは必須です。")
+        self.assertIn("このフィールドは必須です。", form.errors["password"])
 
 
 class TestLogoutView(TestCase):
     def test_success_post(self):
         self.client.login(username="testuser", password="testpassword")
         response = self.client.post(reverse("logout"))
-        self.assertRedirects(response, "/")
+        self.assertRedirects(response, "/accounts/login/")
 
 
 # class TestUserProfileView(TestCase)
