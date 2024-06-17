@@ -203,7 +203,7 @@ class TestLoginView(TestCase):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
 
     def test_success_get(self):
-        response = self.client.get(reverse("login"))
+        response = self.client.get(reverse("accounts:login"))
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
@@ -246,7 +246,7 @@ class TestLoginView(TestCase):
 class TestLogoutView(TestCase):
     def test_success_post(self):
         self.client.login(username="testuser", password="testpassword")
-        response = self.client.post(reverse("logout"))
+        response = self.client.post(reverse("accounts:logout"))
         self.assertRedirects(response, "/accounts/login/")
 
 
