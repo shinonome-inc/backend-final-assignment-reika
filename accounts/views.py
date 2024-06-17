@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 
@@ -21,8 +22,7 @@ class SignupView(CreateView):
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
-    template_name = "profiles/profile.html"
-    login_url = "registration/login.html"
+    template_name = "accounts/profile.html"
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
@@ -32,3 +32,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         else:
             context["username"] = self.request.user.username
         return self.render_to_response(context)
+
+
+class CustomLoginView(LoginView):
+    template_name = "accounts/login.html"
