@@ -32,7 +32,3 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         else:
             context["username"] = self.request.user.username
         return self.render_to_response(context)
-
-
-class CustomLoginView(LoginView):
-    template_name = "accounts/login.html"
