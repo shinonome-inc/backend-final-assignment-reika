@@ -17,7 +17,10 @@ class TestHomeView(TestCase):
 
 
 class TestTweetCreateView(TestCase):
-    url_name = "tweets:create"
+    def setUp(self):
+        self.url = reverse("tweets:create")
+        self.user = get_user_model().objects.create_user(username="testuser", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
 
     def test_success_get(self):
         response = self.client.get(self.url)
@@ -27,7 +30,7 @@ class TestTweetCreateView(TestCase):
         valid_data = {"content": "test tweet"}
         response = self.client.post(self.url, valid_data)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "tweets/home/")
+        self.assertRedirects(response, "/tweets/home/")
 
 
 #    def test_failure_post_with_empty_content(self):

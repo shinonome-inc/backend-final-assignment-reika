@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from .models import Tweet
 
 
-class TweetCreateForm(ModelForm):
+class CreateTweetForm(ModelForm):
 
     class Meta:
         model = Tweet
