@@ -52,17 +52,15 @@ class TestSignupView(TestCase):
             "password2": "",
         }
         response = self.client.post(self.url, invalid_data)
+        form = response.context["form"]
+
         self.assertEqual(response.status_code, 200)
-        self.assertIsNotNone(response.context, "Response context is None, form not passed to the template.")
+        self.assertFalse(form.is_valid())
 
-        if response.context:
-            form = response.context["form"]
-            self.assertFalse(form.is_valid())
-
-            self.assertIn("このフィールドは必須です。", form.errors["username"])
-            self.assertIn("このフィールドは必須です。", form.errors["email"])
-            self.assertIn("このフィールドは必須です。", form.errors["password1"])
-            self.assertIn("このフィールドは必須です。", form.errors["password2"])
+        self.assertIn("このフィールドは必須です。", form.errors["username"])
+        self.assertIn("このフィールドは必須です。", form.errors["email"])
+        self.assertIn("このフィールドは必須です。", form.errors["password1"])
+        self.assertIn("このフィールドは必須です。", form.errors["password2"])
 
     def test_failure_post_with_empty_email(self):
         invalid_data = {
@@ -203,7 +201,7 @@ class TestLoginView(TestCase):
         self.user = User.objects.create_user(username="testuser", password="testpassword")
 
     def test_success_get(self):
-        response = self.client.get(reverse("accounts:login"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
