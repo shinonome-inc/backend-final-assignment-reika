@@ -15,6 +15,7 @@ class TestHomeView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
+
 #    def test_failure_post_with_empty_content(self):
 
 #    def test_failure_post_with_too_long_content(self):
@@ -23,6 +24,7 @@ class TestHomeView(TestCase):
 # class TestTweetDetailView(TestCase):
 #    def test_success_get(self):
 
+#    def test_success_get(self):
 
 # class TestTweetDeleteView(TestCase):
 #    def test_success_post(self):
