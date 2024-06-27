@@ -32,7 +32,6 @@ class TestTweetCreateView(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, "/tweets/home/")
 
-
 #    def test_failure_post_with_empty_content(self):
 
 #    def test_failure_post_with_too_long_content(self):
