@@ -7,4 +7,4 @@ class CreateTweetForm(ModelForm):
 
     class Meta:
         model = Tweet
-        fields = ("content",)
+        fields = {"content"}   

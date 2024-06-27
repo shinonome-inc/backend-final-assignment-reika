@@ -8,4 +8,4 @@ class Tweet(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.content} ({self.time})"
+        return f"{self.username} - {self.content}({self.time})"
