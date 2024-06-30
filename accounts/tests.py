@@ -210,12 +210,9 @@ class TestLoginView(TestCase):
             "password": "testpassword",
         }
         response = self.client.post(self.url, valid_login_data)
-        self.assertRedirects(
-            response,
-            reverse(settings.LOGIN_REDIRECT_URL),
-            status_code=302,
-            target_status_code=200,
-        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(reverse(settings.LOGIN_REDIRECT_URL))
         self.assertIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_not_exists_user(self):
@@ -225,10 +222,10 @@ class TestLoginView(TestCase):
         }
         response = self.client.post(self.url, invalid_login_data)
         form = response.context["form"]
-        self.assertIn(
-            "正しいユーザー名とパスワードを入力してください。どちらのフィールドも大文字と小文字は区別されます。",
-            form.errors["__all__"],
-        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("このユーザーはぞんざいしません。", form.errors["username"])
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_failure_post_with_empty_password(self):
         invalid_login_data = {
@@ -237,16 +234,21 @@ class TestLoginView(TestCase):
         }
         response = self.client.post(self.url, invalid_login_data)
         form = response.context["form"]
+        
         self.assertEqual(response.status_code, 200)
         self.assertIn("このフィールドは必須です。", form.errors["password"])
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestLogoutView(TestCase):
     def test_success_post(self):
         self.client.login(username="testuser", password="testpassword")
         response = self.client.post(reverse("accounts:logout"))
-        self.assertRedirects(response, "/accounts/login/")
-
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(reverse(settings.LOGIN_REDIRECT_URL))
+        self.assertNotIn(SESSION_KEY, self.client.session)
+        
 
 # class TestUserProfileView(TestCase)
 #    def test_success_get(self):
