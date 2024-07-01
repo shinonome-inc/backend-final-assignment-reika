@@ -2,7 +2,7 @@
 {% block title %}Signup{% endblock %}
 
 {% block content %}
-<form method="post">
+<form method="POST">
 	{{ form.as_p }}
     {% csrf_token %}
     <button type="submit">ユーザー登録</button>
