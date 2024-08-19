@@ -1,4 +1,4 @@
-from django.apps import AppConfigSSSSS
+from django.apps import AppConfig
 
 
 class TweetsConfig(AppConfig):
