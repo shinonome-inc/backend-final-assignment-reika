@@ -210,6 +210,8 @@ class TestLoginView(TestCase):
             "password": "testpassword",
         }
         response = self.client.post(self.url, valid_login_data)
+
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
             reverse(settings.LOGIN_REDIRECT_URL),
@@ -237,15 +239,22 @@ class TestLoginView(TestCase):
         }
         response = self.client.post(self.url, invalid_login_data)
         form = response.context["form"]
+
         self.assertEqual(response.status_code, 200)
         self.assertIn("このフィールドは必須です。", form.errors["password"])
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 class TestLogoutView(TestCase):
+    def setUp(self):
+        self.url = reverse(settings.LOGOUT_URL)
+        self.user = User.objects.create_user(username="tester", password="testpassword")
+        self.client.login(username="tester", password="testpassword")
+
     def test_success_post(self):
-        self.client.login(username="testuser", password="testpassword")
-        response = self.client.post(reverse("accounts:logout"))
-        self.assertRedirects(response, "/accounts/login/")
+        response = self.client.post(self.url)
+        self.assertRedirects(response, reverse(settings.LOGOUT_REDIRECT_URL), status_code=302)
+        self.assertNotIn(SESSION_KEY, self.client.session)
 
 
 # class TestUserProfileView(TestCase)
