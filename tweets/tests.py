@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 from .models import Tweet
 
@@ -112,6 +112,7 @@ class TestTweetDeleteView(TestCase):
         response = self.client.post(self.url2)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Tweet.objects.count(), 2)
+
 
 # class TestLikeView(TestCase):
 #    def test_success_post(self):
