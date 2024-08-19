@@ -241,12 +241,14 @@ class TestLoginView(TestCase):
 
 
 class TestLogoutView(TestCase):
-    def test_success_post(self):
-        self.client.login(username="testuser", password="testpassword")
-        response = self.client.post(reverse("accounts:logout"))
+    def setUp(self):
+        self.url = reverse(settings.LOGOUT_URL)
+        self.user = User.objects.create_user(username="tester", password="testpassword")
+        self.client.login(username="tester", password="testpassword")
 
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL), status_code=302)
+    def test_success_post(self):
+        response = self.client.post(self.url)
+        self.assertRedirects(response, reverse(settings.LOGOUT_REDIRECT_URL), status_code=302)
         self.assertNotIn(SESSION_KEY, self.client.session)
 
 

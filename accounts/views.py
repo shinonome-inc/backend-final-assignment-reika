@@ -22,12 +22,3 @@ class SignupView(CreateView):
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = "accounts/profile.html"
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        username = self.kwargs.get("username", None)
-        if username:
-            context["username"] = username
-        else:
-            context["username"] = self.request.user.username
-        return self.render_to_response(context)

@@ -9,93 +9,109 @@ User = get_user_model()
 
 class TestHomeView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="testpassword")
-        self.client.login(username="testuser", password="testpassword")
         self.url = reverse("tweets:home")
+        self.user = User.objects.create_user(username="testuser", email="test@example.com", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
+        self.post1 = Tweet.objects.create(user=self.user, content="testpost1")
+        self.post2 = Tweet.objects.create(user=self.user, content="testpost2")
 
     def test_success_get(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "tweets/home.html")
+        self.assertQuerysetEqual(response.context["tweet_list"], Tweet.objects.order_by("time"), ordered=False)
 
 
 class TestTweetCreateView(TestCase):
-    url_name = reverse("tweets:create")
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", email="test@example.com", password="testpassword")
+        self.url = reverse("tweets:create")
+        self.client.login(username="testuser", password="testpassword")
 
     def test_success_get(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_success_post(self):
-        valid_data = {"content": "test tweet"}
+        valid_data = {
+            "content": "test content",
+        }
         response = self.client.post(self.url, valid_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, "/tweets/home/")
+
+        self.assertRedirects(
+            response,
+            reverse("tweets:home"),
+            status_code=302,
+            target_status_code=200,
+        )
+        self.assertTrue(Tweet.objects.filter(**valid_data).exists())
 
     def test_failure_post_with_empty_content(self):
-        invalid_data = {"content": ""}
-        response = self.client.post(self.url, invalid_data)
-
-        form = response.context["form"]
-
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(form.is_valid())
-
-        self.assertIn("このフィールドは必須です。", form.errors["content"])
-
-    def test_failure_post_with_too_long_content(self):
         invalid_data = {
-            "context": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "content": "",
         }
         response = self.client.post(self.url, invalid_data)
         form = response.context["form"]
 
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(form.is_valid())
+        self.assertIn("このフィールドは必須です。", form.errors["content"])
+        self.assertFalse(Tweet.objects.filter(**invalid_data).exists())
 
-        self.assertIn("長すぎます。", form.errors["content"])
+    def test_failure_post_with_too_long_content(self):
+        invalid_data = {
+            "content": "a" * 256,
+        }
+        response = self.client.post(self.url, invalid_data)
+        form = response.context["form"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            "この値は 140 文字以下でなければなりません( {} 文字になっています)。".format(len(invalid_data["content"])),
+            form.errors["content"],
+        )
+        self.assertFalse(Tweet.objects.filter(**invalid_data).exists())
 
 
 class TestTweetDetailView(TestCase):
-    is_need_kwargs = True
-
     def setUp(self):
-        self.url = reverse_lazy("tweets:detail", kwargs={"pk": str(self.tweet.id)})
+        self.user = User.objects.create_user(username="testuser", email="test@examle.com", password="testpassword")
+        self.client.login(username="testuser", password="testpassword")
+        self.tweet = Tweet.objects.create(user=self.user, content="test tweet")
+        self.url = reverse("tweets:detail", kwargs={"pk": self.tweet.pk})
 
     def test_success_get(self):
-        response = self.client.post(self.url)
-
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(Tweet.objects.filter(content=self.tweet1.content).exists())
+        self.assertEqual(response.context["tweet"], self.tweet)
 
 
 class TestTweetDeleteView(TestCase):
-    is_need_kwargs = True
-    url_name = reverse("tweets:delete")
+    def setUp(self):
+        self.user1 = User.objects.create_user(username="testuser1", email="test1@example.com", password="testpassword")
+        self.user2 = User.objects.create_user(username="testuser2", email="test2@example.com", password="testpassword")
+        self.client.login(
+            username="testuser1",
+            password="testpassword",
+        )
+        self.tweet1 = Tweet.objects.create(user=self.user1, content="tweet1")
+        self.tweet2 = Tweet.objects.create(user=self.user2, content="tweet2")
+        self.url1 = reverse("tweets:delete", kwargs={"pk": self.tweet1.pk})
+        self.url2 = reverse("tweets:delete", kwargs={"pk": self.tweet2.pk})
 
     def test_success_post(self):
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("tweets:home"))
-        self.assertFalse(Tweet.objects.filter(pk=self.tweet1.pk).exists())
+        response = self.client.post(self.url1)
+        self.assertRedirects(response, reverse("tweets:home"), status_code=302, target_status_code=200)
+        self.assertEqual(Tweet.objects.filter(content="tweet").count(), 0)
 
     def test_failure_post_with_not_exist_tweet(self):
-        queryset_before_deletion = Tweet.objects.all()
-        response = self.client.post(self.url_name, kwargs={"pk": self.not_exist_tweet_pk})
-
+        response = self.client.post(reverse("tweets:delete", kwargs={"pk": 99}))
         self.assertEqual(response.status_code, 404)
-        self.assertQuerySetEqual(Tweet.objects.all(), queryset_before_deletion, ordered=False)
+        self.assertEqual(Tweet.objects.count(), 2)
 
     def test_failure_post_with_incorrect_user(self):
-        queryset_before_deletion = Tweet.objects.all()
-        self.client.login(username="tester2", password="testpassword2")
-        response = self.client.post(self.url)
-
+        response = self.client.post(self.url2)
         self.assertEqual(response.status_code, 403)
-        self.assertQuerysetEqual(Tweet.objects.all(), queryset_before_deletion, ordered=False)
-
+        self.assertEqual(Tweet.objects.count(), 2)
 
 # class TestLikeView(TestCase):
 #    def test_success_post(self):

@@ -1,10 +1,11 @@
-from django.forms import ModelForm
+from django import forms
 
 from .models import Tweet
 
 
-class CreateTweetForm(ModelForm):
-
+class TweetCreateForm(forms.ModelForm):
     class Meta:
         model = Tweet
-        fields = {"content"}
+        fields = [
+            "content",
+        ]
