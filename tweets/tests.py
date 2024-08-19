@@ -115,17 +115,17 @@ class TestTweetDeleteView(TestCase):
 
 
 # class TestLikeView(TestCase):
-#    def test_success_post(self):
+#     def test_success_post(self):
 
-#    def test_failure_post_with_not_exist_tweet(self):
+#     def test_failure_post_with_not_exist_tweet(self):
 
-#    def test_failure_post_with_liked_tweet(self):
+#     def test_failure_post_with_liked_tweet(self):
 
 
 # class TestUnLikeView(TestCase):
 
-#    def test_success_post(self):
+#     def test_success_post(self):
 
-#    def test_failure_post_with_not_exist_tweet(self):
+#     def test_failure_post_with_not_exist_tweet(self):
 
-#    def test_failure_post_with_unliked_tweet(self):
+#     def test_failure_post_with_unliked_tweet(self):
